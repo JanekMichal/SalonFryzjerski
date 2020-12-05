@@ -25,25 +25,26 @@ public class Barber implements Runnable {
                 out.writeUTF(i + ":00 - Occupied");
             }
         }
-        out.writeUTF("hello");
     }
-
+    private void change(String name, int time) throws IOException {
+        clientsList[time - 10] = name;
+        showAvailableHours();
+    }
     @Override
     public void run() {
         try {
-            InputStreamReader in = new InputStreamReader(socket.getInputStream());
-            BufferedReader br = new BufferedReader(in);
+            DataInputStream in = new DataInputStream(socket.getInputStream());
 
-
-            String clientInput;
             showAvailableHours();
+            int time = in.readInt();
 
-            while ((clientInput = br.readLine()) != null) {
-                System.out.println("Client" + clientID + ": " + clientInput);
 
-                out.writeUTF(clientInput);
-                out.flush();
-            }
+            out.writeUTF("What is your name?");
+            String clientName = in.readUTF();
+            change(clientName, time);
+            out.writeUTF("OK, your visit will be at " + time + ". See you soon " + clientName);
+
+            in.readUTF();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
