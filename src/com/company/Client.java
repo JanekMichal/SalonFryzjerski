@@ -1,34 +1,11 @@
 package com.company;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
+import java.util.InputMismatchException;
 import java.util.Scanner;
-
-class Recieve extends Thread {
-    private Socket socket;
-    private DataInputStream in;
-    private DataOutputStream out;
-
-    public Recieve(Socket socket, DataInputStream in, DataOutputStream out) {
-        this.socket = socket;
-        this.in = in;
-        this.out = out;
-    }
-
-    public void run() {
-        while (true) {
-            try {
-                System.out.println(in.readUTF());
-            } catch (java.io.EOFException e) {
-                System.out.println("Connection has been lost");
-                System.exit(3);
-            } catch (Exception e) {
-                e.printStackTrace();
-                break;
-            }
-        }
-    }
-}
 
 public class Client {
     public static void main(String[] args) {
@@ -43,25 +20,30 @@ public class Client {
 
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             Scanner reader = new Scanner(System.in);
-            Recieve recieve = new Recieve(socket, in, out);
-            recieve.start();
+            Receive receive = new Receive(socket, in, out);
+            receive.start();
+
+            while (true) {
+                String choice = reader.nextLine();
+                if (choice.equals("r") || choice.equals("c") || choice.equals("e")) {
+                    out.writeUTF(choice);
+                    try {
+                        int time = reader.nextInt();
+                        out.writeInt(time);
+                    } catch (InputMismatchException IME) {
+                        System.out.println("You typed wrong time. Try again.");
+                    }
+                } else {
+                    System.out.println("Your choice is wrong! Try Again.");
+                }
 
 
-            int time = reader.nextInt();
-            out.writeInt(time);
-            reader.nextLine();
-            String clientName = reader.nextLine();
-            out.writeUTF(clientName);
-//            while(true) {
-//                System.out.println(in.readUTF());
-//            }
-//            String clientName = reader.nextLine();
-//            out.writeUTF(clientName);
-
-
+                reader.nextLine();
+                String clientName = reader.nextLine();
+                out.writeUTF(clientName);
+            }
         } catch (IOException IOE) {
             System.out.println("Failed to connect to Server.");
         }
     }
-
 }

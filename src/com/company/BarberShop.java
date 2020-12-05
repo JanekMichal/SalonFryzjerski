@@ -3,8 +3,19 @@ package com.company;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BarberShop {
+    public static String[] clientsList = new String[8];
+    public static List<Barber> clients = new ArrayList<>();
+
+    public static synchronized void showUpdatedReservations() throws IOException {
+        for (Barber barber : clients) {
+            barber.showAvailableHours();
+        }
+    }
+
     public static void main(String[] args) {
         int PORT_NUMBER = 9091;
         System.out.println("Server is running...");
@@ -18,7 +29,9 @@ public class BarberShop {
                 Socket socket = serverSocket.accept();
                 clientID++;
                 System.out.println("Client" + clientID + " connected");
-                Runnable run = new Barber(socket, clientID);
+                Barber barber = new Barber(socket, clientID);
+                Runnable run = barber;
+                clients.add(barber);
                 Thread t = new Thread(run);
                 t.start();
             }
