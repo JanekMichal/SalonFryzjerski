@@ -8,6 +8,21 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
+
+    public static int getTime() {
+        Scanner reader = new Scanner(System.in);
+        int time = reader.nextInt();
+        while (true) {
+            if (time > 17 || time < 10) {
+                System.out.println("You typed wrong time. Try again.");
+                time = reader.nextInt();
+            } else {
+                break;
+            }
+        }
+        return time;
+    }
+
     public static void main(String[] args) {
         String SERVER_IP = "127.0.0.1";
         int PORT_NUMBER = 9091;
@@ -20,30 +35,39 @@ public class Client {
 
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             Scanner reader = new Scanner(System.in);
-            Receive receive = new Receive(socket, in, out);
+            Receive receive = new Receive(in);
             receive.start();
+
+            System.out.print("Give name you want to use: ");
+
+            String msg = reader.nextLine();
+            out.writeUTF(msg);
 
             while (true) {
                 String choice = reader.nextLine();
-                if (choice.equals("r") || choice.equals("c") || choice.equals("e")) {
-                    out.writeUTF(choice);
-                    try {
-                        int time = reader.nextInt();
-                        out.writeInt(time);
-                    } catch (InputMismatchException IME) {
-                        System.out.println("You typed wrong time. Try again.");
+                switch (choice) {
+                    case "r", "c" -> {
+                        out.writeUTF(choice);
+                        out.writeInt(getTime());
                     }
-                } else {
-                    System.out.println("Your choice is wrong! Try Again.");
+                    case "e" -> {
+                        out.writeUTF(choice);
+                        System.out.println("Thank you for thrusting in out cutting skills, bye!");
+                    }
+                    default -> System.out.println("Your choice is wrong! Try Again.");
                 }
-
-
-                reader.nextLine();
-                String clientName = reader.nextLine();
-                out.writeUTF(clientName);
+                if (choice.equals("e")) break;
             }
+            receive.interrupt();
+            in.close();
+            out.close();
+            //socket.close();
         } catch (IOException IOE) {
             System.out.println("Failed to connect to Server.");
+        } finally {
+            System.out.println("Disconnected.");
+
         }
     }
+
 }
