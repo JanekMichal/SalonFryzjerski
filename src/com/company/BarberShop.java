@@ -21,18 +21,15 @@ public class BarberShop {
         System.out.println("Server is running...");
         int clientID = 0;
 
-
         try {
             ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
-
             while (true) {
                 Socket socket = serverSocket.accept();
                 clientID++;
                 System.out.println("Client" + clientID + " connected");
                 Barber barber = new Barber(socket, clientID);
-                Runnable run = barber;
                 clients.add(barber);
-                Thread t = new Thread(run);
+                Thread t = new Thread(barber);
                 t.start();
             }
         } catch (IOException IOE) {

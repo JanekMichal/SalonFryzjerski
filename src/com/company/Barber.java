@@ -16,7 +16,7 @@ public class Barber implements Runnable {
         out = new DataOutputStream(socket.getOutputStream());
         in = new DataInputStream(socket.getInputStream());
     }
-
+    //lista dostępnych godzin
     public void showAvailableHours() throws IOException {
         out.writeUTF("Current available hours:");
         for (int i = 10; i < 18; i++) {
@@ -27,7 +27,7 @@ public class Barber implements Runnable {
             }
         }
     }
-
+    //lista zapisanych klientów
     private void showCurrentClients() {
         System.out.println("Current clients list with hours: ");
         for (int i = 10; i < 18; i++) {
@@ -37,10 +37,9 @@ public class Barber implements Runnable {
                 System.out.println(i + ":00 - " + BarberShop.clientsList[i - 10]);
             }
         }
-
     }
 
-    private void reservation() throws IOException {
+    private synchronized void reservation() throws IOException {
         out.writeUTF("Choose hour you want to visit Barber: ");
         int time = in.readInt();
 
@@ -52,7 +51,7 @@ public class Barber implements Runnable {
         }
     }
 
-    public boolean checkReservation(int time) throws IOException {
+    public synchronized boolean checkReservation(int time) throws IOException {
         if (BarberShop.clientsList[time - 10] != null) {
             out.writeUTF("This hour is already reserved.");
             return false;
@@ -61,7 +60,7 @@ public class Barber implements Runnable {
         }
     }
 
-    public boolean checkCancellation(int time) throws IOException {
+    public synchronized boolean checkCancellation(int time) throws IOException {
         if (BarberShop.clientsList[time - 10] == null) {
             out.writeUTF("You have no appointment at this hour!");
             return false;
@@ -72,10 +71,9 @@ public class Barber implements Runnable {
         return true;
     }
 
-    public void cancelReservation() throws IOException {
+    public synchronized void cancelReservation() throws IOException {
         out.writeUTF("Choose visit you want to cancel:");
         int time = in.readInt();
-
 
         if (checkCancellation(time)) {
             BarberShop.clientsList[time - 10] = null;

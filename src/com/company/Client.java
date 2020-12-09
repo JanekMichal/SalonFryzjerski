@@ -4,12 +4,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Client {
 
-    public static int getTime() {
+    public static int getTimeFromClient() {
         Scanner reader = new Scanner(System.in);
         int time = reader.nextInt();
         while (true) {
@@ -48,7 +47,7 @@ public class Client {
                 switch (choice) {
                     case "r", "c" -> {
                         out.writeUTF(choice);
-                        out.writeInt(getTime());
+                        out.writeInt(getTimeFromClient());
                     }
                     case "e" -> {
                         out.writeUTF(choice);
@@ -58,9 +57,9 @@ public class Client {
                 }
                 if (choice.equals("e")) break;
             }
-            receive.interrupt();
-            in.close();
-            out.close();
+            //receive.interrupt();
+            //in.close();
+            //out.close();
             //socket.close();
         } catch (IOException IOE) {
             System.out.println("Failed to connect to Server.");
