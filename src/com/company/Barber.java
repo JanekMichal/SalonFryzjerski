@@ -16,6 +16,7 @@ public class Barber implements Runnable {
         out = new DataOutputStream(socket.getOutputStream());
         in = new DataInputStream(socket.getInputStream());
     }
+
     //lista dostępnych godzin
     public void showAvailableHours() throws IOException {
         out.writeUTF("Current available hours:");
@@ -27,6 +28,7 @@ public class Barber implements Runnable {
             }
         }
     }
+
     //lista zapisanych klientów
     private void showCurrentClients() {
         System.out.println("Current clients list with hours: ");
